@@ -1,0 +1,161 @@
+\ProvidesPackage{fancytheorem}
+\usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{amsmath}
+\usepackage{environ}
+\usetikzlibrary{positioning,shapes.misc}
+%%% COLOURS FOR THE FANCY NEW ENVIRONMENTS
+\definecolor{eqncolour}{HTML}{9d261d}
+\definecolor{defcolour}{HTML}{049cdb}
+\definecolor{lawcolour}{HTML}{46a546}
+
+%%% THE GENERAL BOX STYLE
+\tikzset{mybox/.style={
+        draw=none,
+		very thick,
+		rectangle,
+		inner sep=10pt,
+		inner ysep=20pt,
+        append after command={
+            [draw=#1, shorten <= -0.5\pgflinewidth]
+            ([shift={( 0.5\pgflinewidth,-0.5\pgflinewidth)}]\tikzlastnode.north west)
+        edge[draw=#1, very thick]
+			([shift={( 0.5\pgflinewidth,+0.5\pgflinewidth)}]\tikzlastnode.south west)            
+        }
+    }
+}
+
+%%% THE FANCY ROUNDED TITLE
+\tikzset{fancytitle/.style={
+	text=white,
+	right=-5pt,
+        minimum height=14pt,
+	append after command={
+   		\pgfextra
+   		\draw[sharp corners, fill=#1, draw=none, ]% 
+   		(\tikzlastnode.west)% 
+	    [rounded corners=1pt] |- (\tikzlastnode.north)% 
+	    [rounded corners=3pt] -| (\tikzlastnode.east)% 
+	    [rounded corners=3pt] |- (\tikzlastnode.south)% 
+	    [rounded corners=1pt] -| (\tikzlastnode.west);
+   \endpgfextra}
+ }
+}
+
+%%% THE FANCY MARGIN NOTE
+\tikzset{fancynote/.style={
+	text=white,
+	append after command={
+   		\pgfextra
+   		\draw[sharp corners, fill=#1, draw=none, ]% 
+   		(\tikzlastnode.west)% 
+	    [rounded corners=3pt] |- (\tikzlastnode.north)% 
+	    [rounded corners=3pt] -| (\tikzlastnode.east)% 
+	    [rounded corners=3pt] |- (\tikzlastnode.south)% 
+	    [rounded corners=3pt] -| (\tikzlastnode.west);
+   \endpgfextra}
+ }
+}
+
+%%% SET UP THE NEW FEQUATION ENVIRONMENT
+\newcounter{EquationCounter}[section]
+\renewcommand{\theEquationCounter}{\thesubsection.\arabic{EquationCounter}}
+\NewEnviron{fequation}[1][]{
+
+\refstepcounter{EquationCounter}
+\marginpar{
+  \hfill
+  \begin{tikzpicture}
+    \node[fancynote=eqncolour]{\footnotesize Eq. \theEquationCounter};
+  \end{tikzpicture}
+}
+\vspace{3pt}
+\noindent
+\ifthenelse{\equal{#1}{}}
+{
+\begin{tikzpicture}
+  \node[fancytitle=eqncolour] (title) {\footnotesize Equation \theEquationCounter};
+  \node[right=10pt] (box) at (title.east) {\begin{minipage}{0.7\textwidth} \BODY \end{minipage}};
+\end{tikzpicture}
+}
+{
+\begin{tikzpicture}
+\node [mybox=eqncolour] (box){
+    \begin{minipage}{0.85\textwidth}
+      \BODY
+    \end{minipage}
+};
+\node[fancytitle=eqncolour] (title) at (box.north west) {\footnotesize Equation \theEquationCounter};
+\node[right=5pt] at (title.east) { \em #1 };
+\end{tikzpicture}
+}
+\vspace{5pt}
+}
+
+%%% SET UP THE NEW FDEFINITION ENVIRONMENT
+\newcounter{DefinitionCounter}[subsection]
+\renewcommand{\theDefinitionCounter}{\thesubsection.\arabic{DefinitionCounter}}
+\NewEnviron{fdefinition}[1][]{
+
+\refstepcounter{DefinitionCounter}
+\marginpar{
+  \hfill
+  \begin{tikzpicture}
+    \node[fancynote=defcolour]{\footnotesize Def. \theDefinitionCounter};
+  \end{tikzpicture}
+}
+\vspace{3pt}
+\noindent
+\begin{tikzpicture}
+\node [mybox=defcolour] (box){
+    \begin{minipage}{0.85\textwidth}
+      \BODY
+    \end{minipage}
+};
+\node[fancytitle=defcolour] (title) at (box.north west) {\footnotesize Definition \theDefinitionCounter};
+\node[right=5pt] at (title.east) { \em #1 };
+\end{tikzpicture}
+\vspace{5pt}
+}
+
+
+%%% SET UP THE NEW FEQUATION* ENVIRONMENT
+\NewEnviron{fequation*}[2][]{
+\refstepcounter{EquationCounter}
+\marginpar{
+  \hfill
+  \begin{tikzpicture}
+    \node[fancynote=eqncolour]{\footnotesize Eq. \theEquationCounter};
+  \end{tikzpicture}
+}
+\vspace{3pt}
+\noindent
+\ifthenelse{\equal{#1}{}}
+{
+\begin{tikzpicture}
+  \node[fancytitle=eqncolour] (title) {\footnotesize Equation \theEquationCounter};
+  \node[right=10pt] (box) at (title.east) {\begin{minipage}{0.7\textwidth} \BODY \end{minipage}};
+\end{tikzpicture}
+}
+{
+\begin{tikzpicture}
+\node [mybox=eqncolour] (box){
+    \begin{minipage}{0.85\textwidth}
+      \BODY
+    \end{minipage}
+};
+\node (table) at (box.east) {\begin{minipage}{0.4\textwidth}
+
+    \end{minipage}
+};
+\node[fancytitle=eqncolour] (title) at (box.north west) {\footnotesize Equation \theEquationCounter};
+\node[right=5pt] at (title.east) { \em #1 };
+\end{tikzpicture}
+}
+\vspace{5pt}
+
+\newcommand*{\symline}[3]{
+  {##1 & ##2 & ##3 \\}
+}
+}
+
